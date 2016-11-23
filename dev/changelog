@@ -1,0 +1,58 @@
+#!/usr/bin/env node
+'use strict';
+
+var execSync = require('child_process').execSync;
+
+var args = require('minimist')(process.argv.slice(2));
+var fromRef = args._[0];
+var toRef = args._[1];
+
+function printHelp() {
+  console.log("Usage: changelog <from-ref> <to-ref>");
+  console.log("  from-ref and to-ref are git refs to compare, e.g. 'v1.0.5' and 'master'");
+}
+
+if (!fromRef || !toRef) {
+  printHelp();
+  process.exit(1);
+}
+
+if (args.h || args.help) {
+  printHelp();
+  process.exit(0);
+}
+
+function readLines(execCmd) {
+  var output = execSync(execCmd).toString().trim();
+  return output ? output.split('\n') : [];
+}
+
+function outputChangelog(ref1, ref2) {
+  var lines = readLines("git log " + ref1 + "..." + ref2 + " --grep='Merge pull request' --pretty='%s %b'");
+  if (lines.length === 0) {
+    console.error("No changes since " + ref1);
+    process.exit(1);
+  }
+
+  var r = new RegExp('^Merge pull request (#\\d+) from \\S+ (.+)$');
+  var error = false;
+  lines.forEach(function(line) {
+    var match = r.exec(line);
+    if (match) {
+      console.log("- " + match[1] + ' ' + match[2]);
+    } else {
+      console.error("ERROR: Unable to parse commit: " + line);
+      error = true;
+    }
+  });
+
+  if (error) {
+    process.exit(1);
+  }
+}
+
+execSync("git fetch origin master --tags", {
+  stdio: ['pipe', 'ignore', 'pipe']
+});
+
+outputChangelog(fromRef, toRef);

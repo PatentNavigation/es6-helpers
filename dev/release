@@ -1,0 +1,25 @@
+#!/usr/bin/env node
+'use strict';
+
+var execSync = require('child_process').execSync;
+var extend = require('util')._extend;
+var repo = require('../package.json').repository;
+
+execSync("./node_modules/.bin/release", {
+  stdio: 'inherit',
+  // in case pre-commit hook to prevent committing to master is in place
+  env: extend({ 'ALLOW_MASTER': 1 }, process.env)
+});
+
+var tags = execSync("git tag -l --sort v:refname").toString().trim().split('\n').filter(function(tag) {
+  return tag[0] === 'v';
+});
+var prevVersion = tags[tags.length - 2];
+var newVersion = tags[tags.length - 1];
+
+var changelog = execSync("./dev/changelog " + prevVersion + " " + newVersion, {
+  stdio: ['pipe', 'pipe', process.stderr]
+}).toString();
+
+console.log("\nVersion tagged! Now paste changelog into " + repo + "/releases/edit/" + newVersion + ":\n");
+console.log(changelog);

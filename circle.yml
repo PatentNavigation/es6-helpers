@@ -1,0 +1,23 @@
+machine:
+  pre:
+    - mkdir ~/.yarn-cache
+  node:
+    version: 6.9.1
+dependencies:
+  pre:
+    - sudo apt-get update
+    # Install Yarn
+    - sudo env "PATH=$PATH" npm install -g yarn
+
+  override:
+    - yarn install
+test:
+  override:
+    - yarn test
+  pre:
+    - ./node_modules/.bin/bower install
+deployment:
+  everything:
+    branch: /^.*$/
+    commands:
+      - ./build.sh
