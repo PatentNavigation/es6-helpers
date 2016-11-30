@@ -41,6 +41,10 @@ test('CacheR8R caches properties', function(assert) {
   assert.equal(tester.aa, 'aa', `can get 'aa' again`);
   assert.equal(aaComputed, 1, `'aa' is not recomputed`);
 
+  tester.clearCache();
+  assert.equal(tester.aa, 'aa', `can get 'aa' after clearing cache`);
+  assert.equal(aaComputed, 2, `'aa' is recomputed after clearing cache`);
+
   assert.equal(tester.bb, 1, `can get 'bb'`);
   assert.equal(bbComputed, 1, `'bb' is computed once`);
   assert.equal(tester.bb, 1, `can get 'bb' again`);
