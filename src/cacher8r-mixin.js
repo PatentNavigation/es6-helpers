@@ -31,7 +31,7 @@ function compare(keys0, keys1) {
 let CacheR8R = (superclass) => class extends superclass {
   constructor(...args) {
     super(...args);
-    this.caches = new SimpleCache();
+    this.clearCache();
   }
 
   cacheOrCompute(keys, computeFn) {
@@ -54,6 +54,10 @@ let CacheR8R = (superclass) => class extends superclass {
       hash = (hash * 33) ^ str.charCodeAt(i);
     }
     return hash >>> 0;
+  }
+
+  clearCache() {
+    this.caches = new SimpleCache();
   }
 
 };
