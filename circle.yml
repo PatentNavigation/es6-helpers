@@ -14,8 +14,3 @@ dependencies:
 test:
   override:
     - yarn test
-deployment:
-  everything:
-    branch: /^.*$/
-    commands:
-      - ./build.sh
