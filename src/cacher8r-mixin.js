@@ -1,30 +1,38 @@
+const VALUE = Symbol('value');
+
 class SimpleCache {
   constructor() {
-    this.cache = [
-      // { keys: [key0, ... keyN], value: <value>},
-    ];
+    // key0: { key1: { __value__: value} }
+    this.cache = new Map([]);
   }
 
   get(getKeys) {
-    return this.cache.find(({ keys }) => compare(keys, getKeys));
+    let { cache } = this;
+    for (let key of getKeys) {
+      if (cache.has(key)) {
+        cache = cache.get(key);
+      } else {
+        return undefined;
+      }
+    }
+    return cache;
   }
 
   set(keys, value) {
-    let cache = this.get(keys);
-    if (cache) {
-      cache.value = value;
-    } else {
-      this.cache.push({ keys, value });
+    let { cache } = this;
+    for (let key of keys) {
+      if (!cache.has(key)) {
+        cache.set(key, new Map([]));
+      }
+      cache = cache.get(key);
     }
+    cache.set(VALUE, value);
     return value;
   }
-}
 
-function compare(keys0, keys1) {
-  return keys0.every((one, ii) => {
-    let other = keys1[ii];
-    return one === other;
-  });
+  valueOf(cache) {
+    return cache.get(VALUE);
+  }
 }
 
 // make a mixin that we can inherit from to get a SimpleCache and a cacheOrCompute method
@@ -36,10 +44,12 @@ let CacheR8R = (superclass) => class extends superclass {
 
   cacheOrCompute(keys, computeFn) {
     let cache = this.caches.get(keys);
-    if (cache) {
-      return cache.value;
+    if (cache !== undefined) {
+      return this.caches.valueOf(cache);
     }
-    return this.caches.set(keys, computeFn());
+    let value = computeFn();
+    this.caches.set(keys, value);
+    return value;
   }
 
   strHash(str) {
