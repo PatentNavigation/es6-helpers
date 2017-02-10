@@ -42,7 +42,7 @@ exec(`${babel} lambda.js --out-file lambda.js`);
 
 console.log(`installing`);
 // then download the dependencies
-exec(`npm install --production`);
+exec(`yarn install --production`);
 
 // Identify dependencies that specify a 'babelify' transform in its package.json
 let babelifyPackages = fs.readdirSync(`node_modules`)
