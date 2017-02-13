@@ -14,7 +14,8 @@ you tell claudia to update the lambda function like so:
 `claudia update --version stage --source package/ --use-local-dependencies`
 */
 
-let fs = require('fs');
+let fs = require('fs-extra');
+let path = require('path');
 let { execSync } = require('child_process');
 
 function exec(command) {
@@ -40,20 +41,53 @@ exec(`${babel} src -d src`); // transpile in place
 // transpile the lambda.js function
 exec(`${babel} lambda.js --out-file lambda.js`);
 
-console.log(`installing`);
+console.log(`yarn install --production`);
 // then download the dependencies
 exec(`yarn install --production`);
 
-// Identify dependencies that specify a 'babelify' transform in its package.json
-let babelifyPackages = fs.readdirSync(`node_modules`)
-  // ignore dot files
-  .filter((dir) => /^(?![.])/.test(dir))
-  // find 'babelify' transforms
-  .filter((dir) => {
-    let { browserify = {} } = require(`${process.cwd()}/node_modules/${dir}/package`);
-    let { transform = [[]] } = browserify;
-    return transform[0][0] === 'babelify';
+function listFiles(dir) {
+  return fs.readdirSync(dir)
+    // ignore dot files
+    .filter((file) => /^(?![.])/.test(file));
+}
+// then fix the damn .bin links
+// yarn's node_modules/.bin directory is full of relative symbolic links to the global
+// yarn cache. These links break when the package directory is packaged up for lambda.
+
+function fixDamnSymlink(symLink) {
+  let realFile = fs.realpathSync(symLink);
+  if (realFile !== symLink) {
+    fs.copySync(realFile, symLink, { overwrite: true });
+    let ax = 493; // 493 is the decimal version of the verboten octal literal 0755
+    fs.chmodSync(symLink, ax);
+  }
+}
+
+function fixBinsInPackages(nodeModulesDir) {
+  if (!fs.existsSync(nodeModulesDir)) {
+    return;
+  }
+  console.log(`fixing bins in ${nodeModulesDir}`);
+  let packageBin = path.join(nodeModulesDir, `.bin`);
+  if (fs.existsSync(packageBin)) {
+    listFiles(packageBin).forEach((symLink) => fixDamnSymlink(path.join(packageBin, symLink)));
+  }
+  let packages = listFiles(nodeModulesDir);
+  // fix .bin directories in the packages
+  packages.forEach((packageDir) => {
+    fixBinsInPackages(path.join(nodeModulesDir, packageDir, `node_modules`));
   });
+}
+
+fixBinsInPackages(`node_modules`);
+
+// Identify dependencies that specify a 'babelify' transform in its package.json
+let babelifyPackages = listFiles(`node_modules`)
+  .filter((dir) => {
+  let { browserify = {} } = require(`${process.cwd()}/node_modules/${dir}/package`);
+  let { transform = [[]] } = browserify;
+  return transform[0][0] === 'babelify';
+});
 
 // transpile each babelify dependency in place
 console.log(
