@@ -33,6 +33,7 @@
     "fs-extra": "^2.0.0"
   },
   "files": [
+    ".babelrc",
     "src",
     "bin"
   ],
