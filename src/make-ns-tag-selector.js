@@ -1,5 +1,36 @@
 let re = require('block-re');
 
+const needsNamespace = re('g')`
+(
+  // a thing that needs a namespace can begin the string; but the beginning of
+  // the string does not need a namespace if it begins with 1+ word chars
+  // followed by a colon
+  ^ (?! \w+ \\* :)
+  |
+  // or a thing that needs a namespace can be preceded by any of several chars
+
+  // a namespace-needing thing can be preceded by an open bracket e.g.,
+  // [foo="1"] => [w:foo="1"]
+
+  // a namespace-needing thing can follow an open paren, e.g.,
+  // :has(foo) => :has(w:foo)
+
+  // a namespace-needing thing can follow a comma, e.g.,
+  // foo,bar => w:foo,w:bar
+
+  // a namespace-needing thing can follow whitespace, e.g.,
+  // foo bar => w:foo w:bar
+
+  [ [ ( , \s ]
+) // close capture group of the stuff before the namespace-needing thing
+
+// capture the namespace-needing thing
+(\w+)
+// but the thing does not need a namespace if it is the namespace (followed by a
+// colon)
+(?! \\* : )
+`
+
 function makeNSTagSelector(namespace) {
   //
   // w is a template-tag function for escaping* and name-spacing ooxml selectors
@@ -18,7 +49,7 @@ function makeNSTagSelector(namespace) {
     if (!namespace) {
       return out;
     }
-    let namespaced = out.replace(/(^|[[(,\s])(\w+)(?!\\*:)/g, `$1${namespace}:$2`);
+    let namespaced = out.replace(needsNamespace, `$1${namespace}:$2`);
     // escape colons separately so that you can easily turn the tag name of a
     // cheerio dom object into a selector. E.g., if you wanted to get the sib of
     // an element if the sib has the same tag as the element, you might do
