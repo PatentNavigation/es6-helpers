@@ -24,17 +24,18 @@ class TestProps extends mix().with(XmlPropertiesMixin, XmlNamespaceMixin) {
     return this.getScalar(`simple-string`);
   }
   set simpleString(val) {
-    let tag = `simple-string`
-    if (val === null) {
-      let $simpleString = this.ensureProperty(tag);
-      $simpleString.remove();
-      return val;
-    }
-    return this.setScalar(tag, val);
+    return this.setOrRemoveScalar(`simple-string`, val);
+  }
+
+  get emptyString() {
+    return this.getScalar(`empty-string`);
+  }
+  set emptyString(val) {
+    return this.setScalar(`empty-string`, val);
   }
 
   get pojo() {
-    return this.getHash(`pojo`)
+    return this.getHash(`pojo`);
   }
   set pojo(obj) {
     return this.setHash(`pojo`, obj);
@@ -69,24 +70,24 @@ test('XmlPropertiesMixin persists data in a Pr element', function(assert) {
   assert.ok(props0.onOff, `onOff property is get/settable`);
   assert.equal($.html($p), `<p><testPr><on-off/></testPr></p>`, `onOff property is persisted in $xml`);
 
-  props0.onOff = false
+  props0.onOff = false;
   assert.notOk(props0.onOff, `onOff property is get/settable`);
   assert.equal($.html($p), `<p><testPr/></p>`, `onOff property is persisted in $xml`);
 
-  props0.simpleString = 'hi'
+  props0.simpleString = 'hi';
   assert.equal(props0.simpleString, `hi`, `simpleString property is get/settable`);
   assert.equal($.html($p), `<p><testPr><simple-string val="hi"/></testPr></p>`, `simpleString property is persisted in $xml`);
 
-  props0.simpleString = 'hello'
+  props0.simpleString = 'hello';
   assert.equal(props0.simpleString, `hello`, `simpleString property is get/settable`);
   assert.equal($.html($p), `<p><testPr><simple-string val="hello"/></testPr></p>`, `simpleString property is persisted in $xml`);
 
-  props0.simpleString = ''
-  assert.equal(props0.simpleString, ``, `simpleString property is get/settable`);
-  assert.equal($.html($p), `<p><testPr><simple-string val=""/></testPr></p>`, `simpleString property is persisted in $xml`);
+  props0.simpleString = '';
+  assert.notOk(props0.simpleString, `simpleString property is get/settable`);
+  assert.equal($.html($p), `<p><testPr></testPr></p>`, `simpleString property is persisted in $xml`);
 
   let props1 = new TestProps($p);
-  props1.simpleString = 'xx'
+  props1.simpleString = 'xx';
   assert.equal(props0.simpleString, `xx`, `properties are not tied to a particular instance of TestProps`);
   props0.simpleString = null;
 
@@ -95,11 +96,11 @@ test('XmlPropertiesMixin persists data in a Pr element', function(assert) {
   assert.equal($.html($p), `<p><testPr><pojo foo="1" bar="2"/></testPr></p>`, `pojo property is persisted in $xml`);
   props0.removeProperty('pojo');
 
-  props1.pushThingies('monkey', 'wildebeest', 'lemur')
+  props1.pushThingies('monkey', 'wildebeest', 'lemur');
   assert.deepEqual(props0.thingies, [
     { id: '0', text: 'monkey' },
     { id: '1', text: 'wildebeest' },
-    { id: '2', text: 'lemur' }]
+    { id: '2', text: 'lemur' } ]
   );
   assert.equal(
     $.html($p),
@@ -112,16 +113,20 @@ test('XmlPropertiesMixin persists data in a Pr element', function(assert) {
   // add a properties object using a different tag for the properties element
   let props2 = new TestProps($p, `otherTestPr`);
   props2.simpleString = 'bar';
-  props0.simpleString = 'foo'
+  props0.simpleString = 'foo';
   assert.equal(
     $.html($p),
     `<p><otherTestPr><simple-string val="bar"/></otherTestPr><testPr><simple-string val="foo"/></testPr></p>`,
     `multiple properties elements can co-exist on the same $root`
   );
 
+  props0.simpleString = '';
+  props0.emptyString = '';
+  assert.equal(props0.emptyString, ``, `emptyString property is get/settable`);
+  assert.equal($.html($p), `<p><testPr><empty-string val=""/></testPr></p>`, `emptyString property is persisted in $xml`);
+
   assert.end();
 });
-
 
 test('XmlPropertiesMixin persists data in a Pr element with a namespace', function(assert) {
   const $ = cheerio.load(`<?xml version="1.0" ?><test-data />`, { xmlMode: true });
@@ -140,25 +145,25 @@ test('XmlPropertiesMixin persists data in a Pr element with a namespace', functi
   assert.ok(props.onOff, `onOff property is get/settable`);
   assert.equal($.html($p), `<w:p><foo:testPr><foo:on-off/></foo:testPr></w:p>`, `onOff property is persisted in $xml`);
 
-  props.onOff = false
+  props.onOff = false;
   assert.notOk(props.onOff, `onOff property is get/settable`);
   assert.equal($.html($p), `<w:p><foo:testPr/></w:p>`, `onOff property is persisted in $xml`);
 
-  props.simpleString = 'hi'
+  props.simpleString = 'hi';
   assert.equal(props.simpleString, `hi`, `simpleString property is get/settable`);
   assert.equal($.html($p), `<w:p><foo:testPr><foo:simple-string val="hi"/></foo:testPr></w:p>`, `simpleString property is persisted in $xml`);
 
-  props.simpleString = 'hello'
+  props.simpleString = 'hello';
   assert.equal(props.simpleString, `hello`, `simpleString property is get/settable`);
   assert.equal($.html($p), `<w:p><foo:testPr><foo:simple-string val="hello"/></foo:testPr></w:p>`, `simpleString property is persisted in $xml`);
 
-  props.simpleString = null
+  props.simpleString = null;
 
-  props.pushThingies('monkey', 'wildebeest', 'lemur')
+  props.pushThingies('monkey', 'wildebeest', 'lemur');
   assert.deepEqual(props.thingies, [
     { id: '0', text: 'monkey' },
     { id: '1', text: 'wildebeest' },
-    { id: '2', text: 'lemur' }]
+    { id: '2', text: 'lemur' } ]
   );
   assert.equal(
     $.html($p),

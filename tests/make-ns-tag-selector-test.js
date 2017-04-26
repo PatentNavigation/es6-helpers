@@ -2,7 +2,7 @@ let test = require('./get-test')();
 let makeNSTagSelector = require('../src/make-ns-tag-selector');
 
 test('makeNSTagSelector escapes and name-spaces a selector', function(assert) {
-  let w = makeNSTagSelector(`w`)
+  let w = makeNSTagSelector(`w`);
   assert.equal(
     w`p`,
     `w\\:p`

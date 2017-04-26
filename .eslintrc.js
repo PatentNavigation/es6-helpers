@@ -1,17 +1,12 @@
 module.exports = {
   root: true,
-  parserOptions: {
-    ecmaVersion: 6,
-    sourceType: 'script'
-  },
-  extends: [
-    'eslint:recommended'
-  ],
   env: {
-    'node': true,
     'es6': true
   },
+  extends: [
+    'plugin:turbopatent/node'
+  ],
   rules: {
-    "no-unused-vars": [ "error", { vars: "all", args: "none" }]
+    'no-var': 'error'
   }
 };

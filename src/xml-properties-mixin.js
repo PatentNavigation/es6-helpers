@@ -130,7 +130,7 @@ let XmlPropertiesMixin = (superclass) => class extends superclass {
   //
   getScalar(tag) {
     let $el = this.ensureProperty(tag);
-    return $el.attr('val')
+    return $el.attr('val');
   }
   //
   // set a scalar value for the given tag as the 'val' atribute of its element
@@ -153,7 +153,7 @@ let XmlPropertiesMixin = (superclass) => class extends superclass {
   setBool(tag, yesNo) {
     let $el = this.ensureProperty(tag);
     if (yesNo) {
-      this.setAttrs($el, true)
+      this.setAttrs($el, true);
     } else {
       $el.remove();
     }

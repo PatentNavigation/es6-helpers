@@ -36,7 +36,7 @@ function makeNSTagSelector(namespace = '') {
   // but the thing does not need a namespace if it is the namespace (followed by a
   // colon)
   (?! \\* : )
-  `
+  `;
 
   return function(strings, ...keys) {
     let out = '';
