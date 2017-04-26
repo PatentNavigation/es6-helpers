@@ -1,7 +1,5 @@
 const cheerio = require('cheerio');
 
-const $ = cheerio.load(`<?xml version="1.0" ?><test-data />`, { xmlMode: true });
-
 const mix = require('../src/mixwith');
 
 const XmlPropertiesMixin = require('../src/xml-properties-mixin');
@@ -46,7 +44,7 @@ class TestProps extends mix().with(XmlPropertiesMixin, XmlNamespaceMixin) {
     return this.getArray(`thingie`);
   }
   pushThingies(...thingies) {
-    thingies.forEach((thingie, ii) => this.push(`thingie`, { id: ii, text: thingie }));
+    thingies.forEach((thingie, ii) => this.pushToArray(`thingie`, { id: ii, text: thingie }));
     return this;
   }
   clearThingies() {
@@ -56,6 +54,7 @@ class TestProps extends mix().with(XmlPropertiesMixin, XmlNamespaceMixin) {
 }
 
 test('XmlPropertiesMixin persists data in a Pr element', function(assert) {
+  const $ = cheerio.load(`<?xml version="1.0" ?><test-data />`, { xmlMode: true });
 
   let $xml = $(`test-data`);
   // make an element that we'll attach properties to
@@ -125,6 +124,7 @@ test('XmlPropertiesMixin persists data in a Pr element', function(assert) {
 
 
 test('XmlPropertiesMixin persists data in a Pr element with a namespace', function(assert) {
+  const $ = cheerio.load(`<?xml version="1.0" ?><test-data />`, { xmlMode: true });
 
   let $xml = $(`test-data`);
   // make an element that we'll attach properties to

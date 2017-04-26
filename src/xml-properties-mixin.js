@@ -15,8 +15,8 @@ const $ = cheerio.load(`<?xml version="1.0" ?>`, { xmlMode: true });
 // properties.foo = { bar: 5, baz: 'bat' } ==> <foo bar="5", baz="bat"/>
 //
 // array elements
-// properties.push('foo', {bar: 5})
-// properties.push('foo', {bar: 6})
+// properties.pushToArray('foo', {bar: 5})
+// properties.pushToArray('foo', {bar: 6})
 // ==> <foo bar="5"/><foo bar="6"/>
 //
 
@@ -114,12 +114,12 @@ let XmlPropertiesMixin = (superclass) => class extends superclass {
     // remove existing elements
     this.removeProperty(tag);
     // set the new elements
-    attrList.forEach((attrs) => this.push(tag, attrs, $Pr));
+    attrList.forEach((attrs) => this.pushToArray(tag, attrs, $Pr));
   }
   //
   // add one array-item having the given attributes for the given tag
   //
-  push(tag, attrs = {}, $Pr = this.ensurePr()) {
+  pushToArray(tag, attrs = {}, $Pr = this.ensurePr()) {
     let $tag = $(`<${this.ensureNamespace(tag)}/>`);
     $Pr.append($tag);
     this.setAttrs($tag, attrs);
