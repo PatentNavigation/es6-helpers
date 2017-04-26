@@ -60,6 +60,12 @@ let XmlPropertiesMixin = (superclass) => class extends superclass {
     return $prop;
   }
   //
+  // remove our $Pr element
+  //
+  removePr() {
+    return this.$Pr.remove();
+  }
+  //
   // find the $element corresponding to a given tag in our $Pr element
   //
   findProperty(tag) {
@@ -129,8 +135,10 @@ let XmlPropertiesMixin = (superclass) => class extends superclass {
   // get a scalar value for the given tag
   //
   getScalar(tag) {
-    let $el = this.ensureProperty(tag);
-    return $el.attr('val');
+    let $el = this.findProperty(tag);
+    if ($el) {
+      return $el.attr('val');
+    }
   }
   //
   // set a scalar value for the given tag as the 'val' atribute of its element
@@ -139,6 +147,20 @@ let XmlPropertiesMixin = (superclass) => class extends superclass {
     let $el = this.ensureProperty(tag);
     this.setAttrs($el, { val });
     return val;
+  }
+  //
+  // set a scalar value for the given tag as the 'val' atribute of its element,
+  // or remove the element if the value is falsy
+  //
+  setOrRemoveScalar(tag, val) {
+    if (!val) {
+      let $prop = this.findProperty(tag);
+      if ($prop) {
+        $prop.remove();
+      }
+      return val;
+    }
+    return this.setScalar(tag, val);
   }
   //
   // get a boolean value indicating whether an element for the given tag eists
@@ -163,7 +185,10 @@ let XmlPropertiesMixin = (superclass) => class extends superclass {
   // get a pojo corresponding to the attributes of the element corresponding to the given tag
   //
   getHash(tag) {
-    let $el = this.ensureProperty(tag);
+    let $el = this.findProperty(tag);
+    if (!$el) {
+      return {};
+    }
     return $el.attr();
   }
   //

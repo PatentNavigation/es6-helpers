@@ -84,7 +84,7 @@ test('XmlPropertiesMixin persists data in a Pr element', function(assert) {
 
   props0.simpleString = '';
   assert.notOk(props0.simpleString, `simpleString property is get/settable`);
-  assert.equal($.html($p), `<p><testPr></testPr></p>`, `simpleString property is persisted in $xml`);
+  assert.equal($.html($p), `<p><testPr/></p>`, `simpleString property is persisted in $xml`);
 
   let props1 = new TestProps($p);
   props1.simpleString = 'xx';
@@ -112,13 +112,14 @@ test('XmlPropertiesMixin persists data in a Pr element', function(assert) {
 
   // add a properties object using a different tag for the properties element
   let props2 = new TestProps($p, `otherTestPr`);
-  props2.simpleString = 'bar';
   props0.simpleString = 'foo';
+  props2.simpleString = 'bar';
   assert.equal(
     $.html($p),
     `<p><otherTestPr><simple-string val="bar"/></otherTestPr><testPr><simple-string val="foo"/></testPr></p>`,
     `multiple properties elements can co-exist on the same $root`
   );
+  props2.removePr();
 
   props0.simpleString = '';
   props0.emptyString = '';
