@@ -1,5 +1,7 @@
 const cheerio = require('cheerio');
 
+const reportUnless = require('./report-unless');
+
 const $ = cheerio.load(`<?xml version="1.0" ?>`, { xmlMode: true });
 
 //
@@ -25,16 +27,11 @@ let XmlPropertiesMixin = (superclass) => class extends superclass {
   // make a new instance, given a root element and a propertiesTag
   //
   constructor(root, { propertiesTag } = {}) {
-    if (!propertiesTag) {
-      throw new Error(`need propertiesTag for XmlProperties`);
-    }
     super(...arguments);
-    // accept either an XmlProperties object (with a .$root property) or a dom element
-    this.$root = root.$root || $(root);
-    if (!this.$root.length) {
-      throw new Error(`need root for XmlProperties`);
-    }
+    reportUnless(propertiesTag, `need propertiesTag for XmlProperties`);
     this.propertiesTag = propertiesTag;
+    this.$root = $(root);
+    reportUnless(this.$root.length, `need root for XmlProperties`);
   }
   //
   // get the $Pr element where our properties are stored
@@ -199,7 +196,6 @@ let XmlPropertiesMixin = (superclass) => class extends superclass {
     this.setAttrs($el, pojo);
     return pojo;
   }
-
 };
 
 module.exports = XmlPropertiesMixin;
