@@ -5,39 +5,45 @@ const $ = cheerio.load(`<?xml version="1.0" ?><test-data />`, { xmlMode: true })
 const mix = require('../src/mixwith');
 
 const XmlPropertiesMixin = require('../src/xml-properties-mixin');
+const XmlNamespaceMixin = require('../src/xml-namespace-mixin');
 
 const test = require('./get-test')();
 
 // define a TestProps class with an on/off property, a simple string property, and an array property
-class TestProps extends mix().with(XmlPropertiesMixin) {
-  constructor($el, tag = `testPr`, namespace) {
-    super($el, tag, namespace);
+class TestProps extends mix().with(XmlPropertiesMixin, XmlNamespaceMixin) {
+  constructor($el, propertiesTag = `testPr`, namespace) {
+    super($el, { propertiesTag, namespace });
   }
   get onOff() {
-    return this.getPropertyValue(`on-off`);
+    return this.getBool(`on-off`);
   }
   set onOff(onOff) {
     // intro is on/off
-    let $prop = this.ensureProperty(`on-off`);
-    if (!onOff) {
-      $prop.remove();
-    }
+    return this.setBool(`on-off`, onOff);
   }
 
   get simpleString() {
-    return this.getPropertyValue(`simple-string`);
+    return this.getScalar(`simple-string`);
   }
   set simpleString(val) {
-    let $simpleString = this.ensureProperty(`simple-string`);
+    let tag = `simple-string`
     if (val === null) {
+      let $simpleString = this.ensureProperty(tag);
       $simpleString.remove();
-      return;
+      return val;
     }
-    this.setAttrs($simpleString, { val });
+    return this.setScalar(tag, val);
+  }
+
+  get pojo() {
+    return this.getHash(`pojo`)
+  }
+  set pojo(obj) {
+    return this.setHash(`pojo`, obj);
   }
 
   get thingies() {
-    return this.getArrayPropertyValue(`thingie`);
+    return this.getArray(`thingie`);
   }
   pushThingies(...thingies) {
     thingies.forEach((thingie, ii) => this.push(`thingie`, { id: ii, text: thingie }));
@@ -84,6 +90,11 @@ test('XmlPropertiesMixin persists data in a Pr element', function(assert) {
   props1.simpleString = 'xx'
   assert.equal(props0.simpleString, `xx`, `properties are not tied to a particular instance of TestProps`);
   props0.simpleString = null;
+
+  props0.pojo = { foo: 1, bar: 2 };
+  assert.deepEqual(props0.pojo, { foo: '1', bar: '2' }, `pojo property is get/settable`);
+  assert.equal($.html($p), `<p><testPr><pojo foo="1" bar="2"/></testPr></p>`, `pojo property is persisted in $xml`);
+  props0.removeProperty('pojo');
 
   props1.pushThingies('monkey', 'wildebeest', 'lemur')
   assert.deepEqual(props0.thingies, [

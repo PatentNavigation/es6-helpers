@@ -1,13 +1,12 @@
-const re = require('block-re');
 const cheerio = require('cheerio');
-
-const makeNSTagSelector = require('./make-ns-tag-selector');
 
 const $ = cheerio.load(`<?xml version="1.0" ?>`, { xmlMode: true });
 
 //
 // mixin to persist data in an xml properties element, similar to how properties
 // are stored in pPr/rPr elements in ooxml.
+//
+// Requires that ./xml-namespace-mixin also be mixed in
 //
 // numbers and strings are stored as the 'val' attribute of an element, e.g.
 // properties.foo = 5 ==> <foo val="5"/>
@@ -22,36 +21,36 @@ const $ = cheerio.load(`<?xml version="1.0" ?>`, { xmlMode: true });
 //
 
 let XmlPropertiesMixin = (superclass) => class extends superclass {
-  constructor(root, propertiesTag, namespace) {
+  //
+  // make a new instance, given a root element and a propertiesTag
+  //
+  constructor(root, { propertiesTag } = {}) {
     if (!propertiesTag) {
       throw new Error(`need propertiesTag for XmlProperties`);
     }
-    super();
-      // accept either an XmlProperties object (with a .$root property) or a dom element
+    super(...arguments);
+    // accept either an XmlProperties object (with a .$root property) or a dom element
     this.$root = root.$root || $(root);
     if (!this.$root.length) {
       throw new Error(`need root for XmlProperties`);
     }
     this.propertiesTag = propertiesTag;
-    this.namespace = namespace;
-    this.makeNSSelector = makeNSTagSelector(namespace);
   }
-  ensureNamespace(tag) {
-    let { namespace } = this;
-    if (!namespace) {
-      return tag;
-    }
-    return tag.replace(re()`^(?!${namespace}:)`, `${namespace}:`);
-  }
-  toSelector(tag) {
-    return this.makeNSSelector`${tag}`;
-  }
-  html() {
-    return $.html(this.$Pr);
-  }
+  //
+  // get the $Pr element where our properties are stored
+  //
   get $Pr() {
     return this.$root.find(`> ${this.toSelector(this.propertiesTag)}`);
   }
+  //
+  // return the html of the $Pr element
+  //
+  html() {
+    return $.html(this.$Pr);
+  }
+  //
+  // return our $Pr element, creating it as a child of our root element if necessary
+  //
   ensurePr() {
     let $prop = this.$Pr;
     if (!$prop.length) {
@@ -60,12 +59,19 @@ let XmlPropertiesMixin = (superclass) => class extends superclass {
     }
     return $prop;
   }
+  //
+  // find the $element corresponding to a given tag in our $Pr element
+  //
   findProperty(tag) {
     let $prop = this.$Pr.find(`> ${this.toSelector(tag)}`);
     if ($prop.length) {
       return $prop;
     }
   }
+  //
+  // return an $element for the given tag, creating it as a child of our $Pr
+  // element if necessary
+  //
   ensureProperty(tag) {
     let $prop = this.findProperty(tag);
     if (!$prop) {
@@ -74,76 +80,99 @@ let XmlPropertiesMixin = (superclass) => class extends superclass {
     }
     return $prop;
   }
+  //
+  // remove the $element for the given tag
+  //
   removeProperty(tag) {
     let $prop = this.findProperty(tag);
     if ($prop) {
       $prop.remove();
     }
   }
-  getPropertyValue(tag) {
-    let $prop = this.findProperty(tag);
-    if ($prop) {
-      return this.getVal($prop);
-    }
+  //
+  // store the keys/values in the given attrs hash as attributes on a dom element
+  //
+  setAttrs(el, attrs = {}) {
+    Object.keys(attrs).forEach((key) => {
+      $(el).attr(key, attrs[key]);
+    });
   }
-  getArrayPropertyValue(tag) {
-    let vals = this.getPropertyValue(tag);
-      // ensure we return an array
-    if (!vals) {
+  //
+  // get an array of pojo values for a given tag
+  //
+  getArray(tag) {
+    let $vals = this.findProperty(tag);
+    if (!$vals) {
       return [];
     }
-    if (Array.isArray(vals)) {
-      return vals;
-    }
-    return [ vals ];
-
+    return $vals.toArray().map((item) => $(item).attr());
   }
-  setArrayProperty(tag, attrList, $Pr = this.ensurePr()) {
-      // remove existing elements
+  //
+  // set an array of pojo values for a given tag
+  //
+  setArray(tag, attrList = [], $Pr = this.ensurePr()) {
+    // remove existing elements
     this.removeProperty(tag);
-    if (!(attrList && attrList.length)) {
-      return;
-    }
+    // set the new elements
     attrList.forEach((attrs) => this.push(tag, attrs, $Pr));
-
   }
-  push(tag, attrs, $Pr = this.ensurePr()) {
-    if (!attrs) {
-      return;
-    }
+  //
+  // add one array-item having the given attributes for the given tag
+  //
+  push(tag, attrs = {}, $Pr = this.ensurePr()) {
     let $tag = $(`<${this.ensureNamespace(tag)}/>`);
     $Pr.append($tag);
     this.setAttrs($tag, attrs);
     return $tag;
   }
-  setAttrs(el, attrs) {
-    Object.keys(attrs).forEach((key) => {
-      $(el).attr(key, attrs[key]);
-    });
+  //
+  // get a scalar value for the given tag
+  //
+  getScalar(tag) {
+    let $el = this.ensureProperty(tag);
+    return $el.attr('val')
   }
-  getVal(el) {
-    if (!el) {
-      return;
+  //
+  // set a scalar value for the given tag as the 'val' atribute of its element
+  //
+  setScalar(tag, val) {
+    let $el = this.ensureProperty(tag);
+    this.setAttrs($el, { val });
+    return val;
+  }
+  //
+  // get a boolean value indicating whether an element for the given tag eists
+  //
+  getBool(tag) {
+    let $el = this.findProperty(tag);
+    return $el && $el.length;
+  }
+  //
+  // create or remove an element for the given tag, depending on the yesNo value
+  //
+  setBool(tag, yesNo) {
+    let $el = this.ensureProperty(tag);
+    if (yesNo) {
+      this.setAttrs($el, true)
+    } else {
+      $el.remove();
     }
-    let $el = el.cheerio ? el : $(el);
-    if ($el.length > 1) {
-      return $el.toArray().map((item) => this.getVal(item));
-    }
-    let attrs = $el.attr();
-    let keys = Object.keys(attrs);
-    let attrCount = keys.length;
-    if (attrCount === 0) {
-      // if no attrs, the property is a boolean. as the element exists, return true
-      return true;
-    }
-    let [ key ] = keys;
-    // if the element has only one attribute, named 'val', then return the value
-    // of that attribute
-    if (attrCount === 1 && key === 'val') {
-      return attrs[key];
-    }
-    // otherwise, return a POJO with all of the attribute key: value pairs
-    return attrs;
+    return yesNo;
+  }
+  //
+  // get a pojo corresponding to the attributes of the element corresponding to the given tag
+  //
+  getHash(tag) {
+    let $el = this.ensureProperty(tag);
+    return $el.attr();
+  }
+  //
+  // set the attributes of the element corresponding to the given tag
+  //
+  setHash(tag, pojo) {
+    let $el = this.ensureProperty(tag);
+    this.setAttrs($el, pojo);
+    return pojo;
   }
 
 };
