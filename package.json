@@ -33,6 +33,7 @@
     "babelify": "^7.3.0",
     "block-re": "git+https://github.com/chadkirby/block-re.git",
     "cheerio": "^0.22.0",
+    "detect-node": "^2.0.3",
     "fs-extra": "^2.0.0"
   },
   "files": [

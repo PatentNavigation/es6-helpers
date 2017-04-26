@@ -1,8 +1,11 @@
 /* eslint-disable no-console */
 
+let isNode = require('detect-node');
+
 function reportUnless(predicate, message, options = {}) {
   let {
-    isUnitTest = global && global.TESTING,
+    // we can't be in a unit test unless we're running in node
+    isUnitTest = isNode ? global.TESTING : false,
     log = console.error
   } = options;
 
