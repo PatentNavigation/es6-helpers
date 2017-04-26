@@ -38,5 +38,10 @@ test('makeNSTagSelector escapes and name-spaces a selector', function(assert) {
     `:not(w\\:body,w\\:tc)`
   );
 
+  assert.equal(
+    w`sdt:first`,
+    `w\\:sdt:first`
+  );
+
   assert.end();
 });
