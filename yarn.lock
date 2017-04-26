@@ -1002,17 +1002,18 @@ escope@^3.6.0:
     esrecurse "^4.1.0"
     estraverse "^4.1.1"
 
-eslint-plugin-ember-suave@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-ember-suave/-/eslint-plugin-ember-suave-1.0.0.tgz#ea7d232a126562dcd8b1ee3aa2700ac3b626e514"
+eslint-plugin-ember@^3.1.2:
+  version "3.1.2"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-ember/-/eslint-plugin-ember-3.1.2.tgz#8387f59189cc0dcbd3a5ecbbafe34a330f118976"
   dependencies:
-    requireindex "~1.1.0"
+    requireindex "^1.1.0"
+    snake-case "^2.1.0"
 
-eslint-plugin-turbopatent@^0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-turbopatent/-/eslint-plugin-turbopatent-0.1.0.tgz#86df5f97047c49701a1da2828b69cb3c1a924c32"
+eslint-plugin-turbopatent@^0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-turbopatent/-/eslint-plugin-turbopatent-0.5.0.tgz#2ca8961c4ba29c727a5dfcc0b40f425895de8746"
   dependencies:
-    eslint-plugin-ember-suave "^1.0.0"
+    eslint-plugin-ember "^3.1.2"
     requireindex "^1.1.0"
 
 eslint@^3.12.1:
@@ -1762,6 +1763,10 @@ loose-envify@^1.0.0:
   dependencies:
     js-tokens "^2.0.0"
 
+lower-case@^1.1.1:
+  version "1.1.4"
+  resolved "https://registry.yarnpkg.com/lower-case/-/lower-case-1.1.4.tgz#9a2cabd1b9e8e0ae993a4bf7d5875c39c42e8eac"
+
 micromatch@^2.1.5:
   version "2.3.11"
   resolved "https://registry.yarnpkg.com/micromatch/-/micromatch-2.3.11.tgz#86677c97d1720b363431d04d0d15293bd38c1565"
@@ -1839,6 +1844,12 @@ nan@^2.3.0:
 natural-compare@^1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/natural-compare/-/natural-compare-1.4.0.tgz#4abebfeed7541f2c27acfb29bdbbd15c8d5ba4f7"
+
+no-case@^2.2.0:
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/no-case/-/no-case-2.3.1.tgz#7aeba1c73a52184265554b7dc03baf720df80081"
+  dependencies:
+    lower-case "^1.1.1"
 
 node-pre-gyp@^0.6.29:
   version "0.6.32"
@@ -2184,7 +2195,7 @@ require-uncached@^1.0.2:
     caller-path "^0.1.0"
     resolve-from "^1.0.0"
 
-requireindex@^1.1.0, requireindex@~1.1.0:
+requireindex@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/requireindex/-/requireindex-1.1.0.tgz#e5404b81557ef75db6e49c5a72004893fe03e162"
 
@@ -2268,6 +2279,12 @@ slash@^1.0.0:
 slice-ansi@0.0.4:
   version "0.0.4"
   resolved "https://registry.yarnpkg.com/slice-ansi/-/slice-ansi-0.0.4.tgz#edbf8903f66f7ce2f8eafd6ceed65e264c831b35"
+
+snake-case@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/snake-case/-/snake-case-2.1.0.tgz#41bdb1b73f30ec66a04d4e2cad1b76387d4d6d9f"
+  dependencies:
+    no-case "^2.2.0"
 
 sntp@1.x.x:
   version "1.0.9"

@@ -5,8 +5,5 @@ module.exports = {
   },
   extends: [
     'plugin:turbopatent/node'
-  ],
-  rules: {
-    'no-var': 'error'
-  }
+  ]
 };
