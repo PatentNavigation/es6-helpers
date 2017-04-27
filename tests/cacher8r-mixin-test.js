@@ -15,19 +15,19 @@ test('CacheR8R caches properties', function(assert) {
       this.html = 'hi there';
     }
     get aa() {
-      return this.cacheOrCompute(['aa'], () => {
+      return this.cacheOrCompute([ 'aa' ], () => {
         aaComputed += 1;
         return 'aa';
       });
     }
     get bb() {
-      return this.cacheOrCompute(['bb', this.xx], () => {
+      return this.cacheOrCompute([ 'bb', this.xx ], () => {
         bbComputed += 1;
         return this.xx;
       });
     }
     get cc() {
-      return this.cacheOrCompute([this.strHash(this.html)], () => {
+      return this.cacheOrCompute([ this.strHash(this.html) ], () => {
         ccComputed += 1;
         return this.html;
       });

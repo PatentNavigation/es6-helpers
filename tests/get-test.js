@@ -5,6 +5,9 @@ let realTest = require('tape-catch');
 module.exports = getTest;
 
 function getTest() {
+  if (global) {
+    global.TESTING = true;
+  }
   let testFile = path.basename(module.parent.filename, '.js');
   function test(description, ...args) {
     // add the name of the test-file to the description

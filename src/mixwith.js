@@ -12,6 +12,6 @@ class Mixer {
   }
 }
 
-function mix(superclass = class{}) {
+function mix(superclass = class {}) {
   return new Mixer(superclass);
 }

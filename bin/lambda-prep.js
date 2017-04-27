@@ -19,7 +19,7 @@ let path = require('path');
 let { execSync } = require('child_process');
 
 function exec(command) {
-  return execSync(command, {encoding: 'utf-8'});
+  return execSync(command, { encoding: 'utf-8' });
 }
 
 console.log(`packing`);
@@ -84,10 +84,10 @@ fixBinsInPackages(`node_modules`);
 // Identify dependencies that specify a 'babelify' transform in its package.json
 let babelifyPackages = listFiles(`node_modules`)
   .filter((dir) => {
-  let { browserify = {} } = require(`${process.cwd()}/node_modules/${dir}/package`);
-  let { transform = [[]] } = browserify;
-  return transform[0][0] === 'babelify';
-});
+    let { browserify = {} } = require(`${process.cwd()}/node_modules/${dir}/package`);
+    let { transform = [ [] ] } = browserify;
+    return transform[0][0] === 'babelify';
+  });
 
 // transpile each babelify dependency in place
 console.log(
