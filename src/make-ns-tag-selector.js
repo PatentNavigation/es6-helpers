@@ -33,9 +33,6 @@ function makeNSTagSelector(namespace = '') {
 
   // capture the namespace-needing thing
   (\w+)
-  // but the thing does not need a namespace if it is the namespace (followed by a
-  // colon)
-  (?! \\* : )
   `;
 
   return function(strings, ...keys) {
@@ -55,7 +52,7 @@ function makeNSTagSelector(namespace = '') {
     // cheerio dom object into a selector. E.g., if you wanted to get the sib of
     // an element if the sib has the same tag as the element, you might do
     // something like so: ({name} = $wr[0]); $sib = $wr.next(w`${name}`)
-    return namespaced.replace(re('g')`${namespace}:`, `${namespace}\\:`);
+    return namespaced.replace(re('g')`\b${namespace}:`, `${namespace}\\:`);
   };
 }
 

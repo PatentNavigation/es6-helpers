@@ -14,6 +14,11 @@ test('makeNSTagSelector escapes and name-spaces a selector', function(assert) {
   );
 
   assert.equal(
+    w`w\\:p`,
+    `w\\:p`
+  );
+
+  assert.equal(
     w`${w`w:p`}`,
     `w\\:p`
   );
