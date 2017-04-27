@@ -174,3 +174,21 @@ test('XmlPropertiesMixin persists data in a Pr element with a namespace', functi
 
   assert.end();
 });
+
+test(`XmlPropertiesMixin instances can copy themselves as a new type`, (assert) => {
+  const $ = cheerio.load(`<?xml version="1.0" ?><test-data />`, { xmlMode: true });
+
+  let $xml = $(`test-data`);
+  // make an element that we'll attach properties to
+  let $p = $(`<w:p>`);
+  $xml.append($p);
+
+  class Props1 {}
+
+  let props0 = new TestProps($p, `testPr`);
+  let props1 = props0.copyAs(Props1);
+
+  assert.ok(props0 instanceof TestProps);
+  assert.ok(props1 instanceof Props1);
+  assert.end();
+})

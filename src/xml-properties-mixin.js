@@ -200,6 +200,10 @@ let XmlPropertiesMixin = (superclass) => class extends superclass {
     this.setAttrs($el, pojo);
     return pojo;
   }
+
+  copyAs(NewPropsClass) {
+    return new NewPropsClass(this.$root);
+  }
 };
 
 module.exports = XmlPropertiesMixin;
