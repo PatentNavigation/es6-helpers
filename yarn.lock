@@ -1013,9 +1013,9 @@ eslint-plugin-ember@^3.1.2:
     requireindex "^1.1.0"
     snake-case "^2.1.0"
 
-eslint-plugin-turbopatent@^0.5.0:
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-turbopatent/-/eslint-plugin-turbopatent-0.5.0.tgz#2ca8961c4ba29c727a5dfcc0b40f425895de8746"
+eslint-plugin-turbopatent@^0.6.2:
+  version "0.6.2"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-turbopatent/-/eslint-plugin-turbopatent-0.6.2.tgz#e5b86c13b430ced17a4b26a309432bc311dc9e73"
   dependencies:
     eslint-plugin-ember "^3.1.2"
     requireindex "^1.1.0"
