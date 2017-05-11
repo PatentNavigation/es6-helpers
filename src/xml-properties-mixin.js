@@ -30,6 +30,9 @@ let XmlPropertiesMixin = (superclass) => class extends superclass {
       // a missing propertiesTag is an unrecoverable error
       throw new Error(`need propertiesTag for XmlProperties`);
     }
+    if (!isPropertiesTag(propertiesTag)) {
+      throw new Error(`propertiesTag must end in "Pr"`);
+    }
     this.propertiesTag = propertiesTag;
     this.$root = $(root);
     if (!this.$root.length) {
@@ -41,16 +44,36 @@ let XmlPropertiesMixin = (superclass) => class extends superclass {
   // get the $Pr element where our properties are stored
   //
   get $Pr() {
-    return this.$root.find(`> ${this.toSelector(this.propertiesTag)}`);
+    // this getter can be a performance bottleneck when our $root has lots of
+    // children, so we'll do some manual traversing and cache the results to
+    // speed up the process. We're assuming 1) that our $root may have other
+    // properties elements; 2) that property-elements are always prepended to
+    // $root; and 3) that a properties element's name ends in 'Pr'
+    if (this._Pr) {
+      return this._Pr;
+    }
+    let $Pr = findOneChild(
+      // search children of our $root
+      this.$root,
+      // for an element with our propertiesTag
+      this.ensureNamespace(this.propertiesTag),
+      // stop searching when we hit an element that is not a properties element
+      ({ name }) => !isPropertiesTag(name)
+    );
+    if ($Pr.length) {
+      // once our $Pr has been created, it shouldn't change, so we'll cache it
+      this._Pr = $Pr;
+    }
+    return $Pr;
   }
   //
-  // return the html of the $Pr element
+  // return the (outer) html of the $Pr element
   //
   html() {
     return $.html(this.$Pr);
   }
   //
-  // return our $Pr element, creating it as a child of our root element if necessary
+  // return our $Pr element, prepending it as a child of our root element if necessary
   //
   ensurePr() {
     let $prop = this.$Pr;
@@ -67,10 +90,10 @@ let XmlPropertiesMixin = (superclass) => class extends superclass {
     return this.$Pr.remove();
   }
   //
-  // find the $element corresponding to a given tag in our $Pr element
+  // find the $element(s) corresponding to a given tag in our $Pr element
   //
   findProperty(tag) {
-    let $prop = this.$Pr.find(`> ${this.toSelector(tag)}`);
+    let $prop = findChildren(this.$Pr, this.ensureNamespace(tag));
     if ($prop.length) {
       return $prop;
     }
@@ -205,5 +228,35 @@ let XmlPropertiesMixin = (superclass) => class extends superclass {
     return new NewPropsClass(this.$root);
   }
 };
+
+function isPropertiesTag(tag) {
+  return tag.endsWith(`Pr`);
+}
+
+function findOneChild($el, targetName, shouldEarlyOut = no) {
+  return findChildren($el, targetName, (child, results) => results.length || shouldEarlyOut(child, results));
+}
+
+function findChildren($el, targetName, shouldEarlyOut = no) {
+  let results = [];
+  if ($el.length) {
+    let { children } = $el[0];
+    for (let child of children) {
+      let { name } = child;
+      if (name === targetName) {
+        results.push(child);
+      }
+      // stop searching?
+      if (shouldEarlyOut(child, results)) {
+        break;
+      }
+    }
+  }
+  return $(results);
+}
+
+function no() {
+  return false;
+}
 
 module.exports = XmlPropertiesMixin;
