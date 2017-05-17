@@ -135,7 +135,7 @@ let XmlPropertiesMixin = (superclass) => class extends superclass {
     if (!$vals) {
       return [];
     }
-    return $vals.toArray().map((item) => $(item).attr());
+    return $vals.toArray().map(({ attribs }) => attribs);
   }
   //
   // set an array of pojo values for a given tag
