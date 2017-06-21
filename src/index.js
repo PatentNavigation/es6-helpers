@@ -12,3 +12,5 @@ exports.makeNSTagSelector = require('./make-ns-tag-selector');
 
 exports.XmlPropertiesMixin = require('./xml-properties-mixin');
 exports.XmlNamespaceMixin = require('./xml-namespace-mixin');
+
+exports.config = require('./config');

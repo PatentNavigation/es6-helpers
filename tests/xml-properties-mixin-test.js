@@ -191,4 +191,4 @@ test(`XmlPropertiesMixin instances can copy themselves as a new type`, (assert) 
   assert.ok(props0 instanceof TestProps);
   assert.ok(props1 instanceof Props1);
   assert.end();
-})
+});
