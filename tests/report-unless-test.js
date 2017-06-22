@@ -1,5 +1,6 @@
 let test = require('./get-test')();
 let reportUnless = require('../src/report-unless');
+let config = require('../src/config');
 
 test(`reportUnless works`, (assert) => {
   assert.throws(
@@ -18,8 +19,9 @@ test(`reportUnless works`, (assert) => {
   );
 
   let logged;
+  config.logger = (msg) => logged = msg;
   assert.doesNotThrow(
-    () => reportUnless(false, `baz`, { isUnitTest: false, log: (msg) => logged = msg }),
+    () => reportUnless(false, `baz`, { isUnitTest: false }),
     `should not throw when not unit test`
   );
   assert.equal(logged, `baz`, `message was logged`);
@@ -33,4 +35,4 @@ test(`reportUnless works`, (assert) => {
     `reportUnless returns false when it does not report`
   );
   assert.end();
-})
+});

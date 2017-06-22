@@ -2,11 +2,13 @@
 
 let isNode = require('detect-node');
 
+let config = require('./config');
+
 function reportUnless(predicate, message, options = {}) {
   let {
     // we can't be in a unit test unless we're running in node
     isUnitTest = isNode ? global.TESTING : false,
-    log = console.error
+    extra = ''
   } = options;
 
   if (predicate) {
@@ -16,7 +18,7 @@ function reportUnless(predicate, message, options = {}) {
   if (isUnitTest) {
     throw new Error(message);
   }
-  log(message);
+  config.logger(message, extra);
   // we did report, so return true
   return true;
 }
