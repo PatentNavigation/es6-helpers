@@ -45,7 +45,7 @@ class TestProps extends mix().with(XmlPropertiesMixin, XmlNamespaceMixin) {
     return this.getArray(`thingie`);
   }
   pushThingies(...thingies) {
-    thingies.forEach((thingie, ii) => this.pushToArray(`thingie`, { id: ii, text: thingie }));
+    thingies.forEach((thingie) => this.pushToArray(`thingie`, { id: this.getArray(`thingie`).length, text: thingie }));
     return this;
   }
   clearThingies() {
@@ -98,7 +98,8 @@ test('XmlPropertiesMixin persists data in a Pr element', function(assert) {
   assert.equal($.html($p), `<p><testPr><pojo foo="1" bar="2"/></testPr></p>`, `pojo property is persisted in $xml`);
   props0.removeProperty('pojo');
 
-  props1.pushThingies('monkey', 'wildebeest', 'lemur');
+  props1.pushThingies('monkey');
+  props1.pushThingies('wildebeest', 'lemur');
   assert.deepEqual(props0.thingies, [
     { id: '0', text: 'monkey' },
     { id: '1', text: 'wildebeest' },
@@ -109,7 +110,7 @@ test('XmlPropertiesMixin persists data in a Pr element', function(assert) {
     `<p><testPr><thingie id="0" text="monkey"/><thingie id="1" text="wildebeest"/><thingie id="2" text="lemur"/></testPr></p>`,
     `thingies array property is persisted in $xml`
   );
-  assert.ok(props0.propertiesCache.has(`thingie`), `thingies property is cached`);
+  assert.notOk(props0.propertiesCache.has(`thingie`), `thingies array property is not cached`);
 
   props0.clearThingies();
   assert.notOk(props0.propertiesCache.has(`thingie`), `thingies property is not cached after being cleared`);
