@@ -69,6 +69,7 @@ test('XmlPropertiesMixin persists data in a Pr element', function(assert) {
   props0.onOff = true;
   assert.ok(props0.onOff, `onOff property is get/settable`);
   assert.equal($.html($p), `<p><testPr><on-off/></testPr></p>`, `onOff property is persisted in $xml`);
+  assert.ok(props0.propertiesCache.has(`on-off`), `onOff property is cached`);
 
   props0.onOff = false;
   assert.notOk(props0.onOff, `onOff property is get/settable`);
@@ -77,6 +78,7 @@ test('XmlPropertiesMixin persists data in a Pr element', function(assert) {
   props0.simpleString = 'hi';
   assert.equal(props0.simpleString, `hi`, `simpleString property is get/settable`);
   assert.equal($.html($p), `<p><testPr><simple-string val="hi"/></testPr></p>`, `simpleString property is persisted in $xml`);
+  assert.ok(props0.propertiesCache.has(`simple-string`), `simpleString property is cached`);
 
   props0.simpleString = 'hello';
   assert.equal(props0.simpleString, `hello`, `simpleString property is get/settable`);
@@ -107,8 +109,10 @@ test('XmlPropertiesMixin persists data in a Pr element', function(assert) {
     `<p><testPr><thingie id="0" text="monkey"/><thingie id="1" text="wildebeest"/><thingie id="2" text="lemur"/></testPr></p>`,
     `thingies array property is persisted in $xml`
   );
+  assert.ok(props0.propertiesCache.has(`thingie`), `thingies property is cached`);
 
   props0.clearThingies();
+  assert.notOk(props0.propertiesCache.has(`thingie`), `thingies property is not cached after being cleared`);
 
   // add a properties object using a different tag for the properties element
   let props2 = new TestProps($p, `otherTestPr`);
