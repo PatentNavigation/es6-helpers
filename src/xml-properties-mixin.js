@@ -85,13 +85,6 @@ let XmlPropertiesMixin = (superclass) => class extends superclass {
     return $prop;
   }
   //
-  // remove our $Pr element
-  //
-  removePr() {
-    this.propertiesCache.clear();
-    return this.$Pr.remove();
-  }
-  //
   // find the $element(s) corresponding to a given tag in our $Pr element
   //
   findProperty(tag) {

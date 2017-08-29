@@ -123,13 +123,6 @@ test('XmlPropertiesMixin persists data in a Pr element', function(assert) {
     `<p><otherTestPr><simple-string val="bar"/></otherTestPr><testPr><simple-string val="foo"/></testPr></p>`,
     `multiple properties elements can co-exist on the same $root`
   );
-  props2.removePr();
-
-  props0.simpleString = '';
-  props0.emptyString = '';
-  assert.equal(props0.emptyString, ``, `emptyString property is get/settable`);
-  assert.equal($.html($p), `<p><testPr><empty-string val=""/></testPr></p>`, `emptyString property is persisted in $xml`);
-
   assert.end();
 });
 
