@@ -39,6 +39,9 @@ let XmlPropertiesMixin = (superclass) => class extends superclass {
       // a missing $root is an unrecoverable error
       throw new Error(`need root for XmlProperties`);
     }
+    // make a map to cache properties elements so that we don't spend so much
+    // time traversing when the dom is very large
+    this.propertiesCache = new Map();
   }
   //
   // get the $Pr element where our properties are stored
@@ -49,9 +52,6 @@ let XmlPropertiesMixin = (superclass) => class extends superclass {
     // speed up the process. We're assuming 1) that our $root may have other
     // properties elements; 2) that property-elements are always prepended to
     // $root; and 3) that a properties element's name ends in 'Pr'
-    if (this._Pr) {
-      return this._Pr;
-    }
     let $Pr = findOneChild(
       // search children of our $root
       this.$root,
@@ -61,8 +61,9 @@ let XmlPropertiesMixin = (superclass) => class extends superclass {
       ({ name }) => !isPropertiesTag(name)
     );
     if ($Pr.length) {
-      // once our $Pr has been created, it shouldn't change, so we'll cache it
-      this._Pr = $Pr;
+      // once our $Pr has been created, it shouldn't change, so we'll replace
+      // this getter with a simple property
+      Object.defineProperty(this, `$Pr`, { value: $Pr });
     }
     return $Pr;
   }
@@ -84,19 +85,24 @@ let XmlPropertiesMixin = (superclass) => class extends superclass {
     return $prop;
   }
   //
-  // remove our $Pr element
-  //
-  removePr() {
-    return this.$Pr.remove();
-  }
-  //
   // find the $element(s) corresponding to a given tag in our $Pr element
   //
-  findProperty(tag) {
-    let $prop = findChildren(this.$Pr, this.ensureNamespace(tag));
-    if ($prop.length) {
-      return $prop;
+  findProperty(tag, { noCache } = {}) {
+    let { propertiesCache } = this;
+    if (!noCache && propertiesCache.has(tag)) {
+      return propertiesCache.get(tag);
     }
+    let $prop = findChildren(this.$Pr, this.ensureNamespace(tag));
+    if (!$prop.length) {
+      return;
+    }
+    if (!noCache) {
+      // for non-array properties, there should be one $element per tag. Once
+      // the $element is created, it should persist until the property for that
+      // tag is removed
+      propertiesCache.set(tag, $prop);
+    }
+    return $prop;
   }
   //
   // return an $element for the given tag, creating it as a child of our $Pr
@@ -107,6 +113,7 @@ let XmlPropertiesMixin = (superclass) => class extends superclass {
     if (!$prop) {
       $prop = $(`<${this.ensureNamespace(tag)}/>`);
       this.ensurePr().append($prop);
+      this.propertiesCache.set(tag, $prop);
     }
     return $prop;
   }
@@ -117,6 +124,7 @@ let XmlPropertiesMixin = (superclass) => class extends superclass {
     let $prop = this.findProperty(tag);
     if ($prop) {
       $prop.remove();
+      this.propertiesCache.delete(tag, $prop);
     }
   }
   //
@@ -131,7 +139,8 @@ let XmlPropertiesMixin = (superclass) => class extends superclass {
   // get an array of pojo values for a given tag
   //
   getArray(tag) {
-    let $vals = this.findProperty(tag);
+    // don't cache array elements because they may come and go
+    let $vals = this.findProperty(tag, { noCache: true });
     if (!$vals) {
       return [];
     }
@@ -180,7 +189,7 @@ let XmlPropertiesMixin = (superclass) => class extends superclass {
     if (!val) {
       let $prop = this.findProperty(tag);
       if ($prop) {
-        $prop.remove();
+        this.removeProperty(tag);
       }
       return val;
     }
@@ -201,7 +210,7 @@ let XmlPropertiesMixin = (superclass) => class extends superclass {
     if (yesNo) {
       this.setAttrs($el, true);
     } else {
-      $el.remove();
+      this.removeProperty(tag);
     }
     return yesNo;
   }
