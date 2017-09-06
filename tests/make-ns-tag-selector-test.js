@@ -34,6 +34,21 @@ test('makeNSTagSelector escapes and name-spaces a selector', function(assert) {
   );
 
   assert.equal(
+    w`rStyle[val=deleted]`,
+    `w\\:rStyle[w\\:val=deleted]`
+  );
+
+  assert.equal(
+    w`rStyle[val="wakka wakka"]`,
+    `w\\:rStyle[w\\:val="wakka wakka"]`
+  );
+
+  assert.equal(
+    w`rStyle[val="don't worry"]`,
+    `w\\:rStyle[w\\:val="don't worry"]`
+  );
+
+  assert.equal(
     w`> :not(p > pPr)`,
     `> :not(w\\:p > w\\:pPr)`
   );
@@ -46,6 +61,16 @@ test('makeNSTagSelector escapes and name-spaces a selector', function(assert) {
   assert.equal(
     w`sdt:first`,
     `w\\:sdt:first`
+  );
+
+  assert.equal(
+    w`r:has(instrText:contains("MERGEFIELD UsDocNum"))`,
+    `w\\:r:has(w\\:instrText:contains("MERGEFIELD UsDocNum"))`
+  );
+
+  assert.equal(
+    w`r:has(instrText:contains(UsDocNum))`,
+    `w\\:r:has(w\\:instrText:contains(UsDocNum))`
   );
 
   assert.end();
