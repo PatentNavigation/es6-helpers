@@ -47,12 +47,22 @@ function makeNSTagSelector(namespace = '') {
     if (!namespace) {
       return out;
     }
+    // we should not add namespaces inside any quoted strings or inside
+    // :contains(), so we'll temporarily replace those substrings with tokens
+    let notNamespaces = {};
+    out = out.replace(/(['"']).+?\1|:contains[(].+?[)]/g, (notNamespace, quot, ii) => {
+      notNamespaces[ii] = notNamespace;
+      return `<<${ii}>>`;
+    });
     let namespaced = out.replace(needsNamespace, `$1${namespace}:$2`);
     // escape colons separately so that you can easily turn the tag name of a
     // cheerio dom object into a selector. E.g., if you wanted to get the sib of
     // an element if the sib has the same tag as the element, you might do
     // something like so: ({name} = $wr[0]); $sib = $wr.next(w`${name}`)
-    return namespaced.replace(re('g')`\b${namespace}:`, `${namespace}\\:`);
+    namespaced = namespaced.replace(re('g')`\b${namespace}:`, `${namespace}\\:`);
+    // restore any quoted-string or :contains() tokens
+    namespaced = namespaced.replace(/<<(\d+)>>/g, (tag, ii) => notNamespaces[ii]);
+    return namespaced;
   };
 }
 
