@@ -6,7 +6,7 @@
   "scripts": {
     "test": "npm run lint; tape \"tests/*-test.js\" | tap-diff",
     "lint": "eslint src; eslint bin; eslint tests",
-    "release": "dev/release"
+    "release": "tp-release"
   },
   "repository": "https://github.com/PatentNavigation/es6-helpers",
   "author": "Chad Kirby",
@@ -14,10 +14,10 @@
   "devDependencies": {
     "eslint": "^3.12.1",
     "eslint-plugin-turbopatent": "^0.6.2",
-    "git-release": "^0.6.0",
     "tap-diff": "^0.1.1",
     "tape": "^4.6.2",
-    "tape-catch": "^1.0.6"
+    "tape-catch": "^1.0.6",
+    "tom-jumbo-grumbo": "git+ssh://git@github.com/PatentNavigation/tom-jumbo-grumbo.git#v1.0.2"
   },
   "browserify": {
     "transform": [
