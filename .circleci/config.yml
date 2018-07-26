@@ -1,0 +1,29 @@
+# Cache key definitions
+cache-node-modules: &cache-node-modules
+  key: node-modules-cache-v1-{{ checksum "package.json" }}
+
+version: 2
+jobs:
+  test:
+    docker:
+      - image: circleci/node:7.10
+
+    steps:
+      - checkout
+      - restore_cache:
+          <<: *cache-node-modules
+      - run:
+          name: ensure node_modules
+          command: |
+            [ -d node_modules ] || yarn
+      - run: yarn test
+      - save_cache:
+          <<: *cache-node-modules
+          paths:
+            - node_modules
+
+workflows:
+  version: 2
+  ci:
+    jobs:
+      - test
