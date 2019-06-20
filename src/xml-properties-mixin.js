@@ -57,8 +57,9 @@ let XmlPropertiesMixin = (superclass) => class extends superclass {
       this.$root,
       // for an element with our propertiesTag
       this.ensureNamespace(this.propertiesTag),
-      // stop searching when we hit an element that is not a properties element
-      ({ name }) => !isPropertiesTag(name)
+      // stop searching when we hit a non-text element that is not a properties
+      // element
+      ({ name, type }) => type !== `text` && !isPropertiesTag(name)
     );
     if ($Pr.length) {
       // once our $Pr has been created, it shouldn't change, so we'll replace
