@@ -190,3 +190,27 @@ test(`XmlPropertiesMixin instances can copy themselves as a new type`, (assert) 
   assert.ok(props1 instanceof Props1);
   assert.end();
 });
+
+test('XmlPropertiesMixin tolerates whitespace in the XML', function(assert) {
+  const $ = cheerio.load(`<?xml version="1.0" ?><test-data />`, { xmlMode: true });
+
+  let $xml = $(`test-data`);
+  // make a pretty-formatted element that we'll attach properties to
+  let $p = $(`<w:p>
+            <w:pPr>
+                <w:pStyle w:val="TPSTitle"></w:pStyle>
+            </w:pPr>
+            <w:r>
+                <w:t xml:space="preserve">Scalable Multi-Die Deep Learning System</w:t>
+            </w:r>
+        </w:p>`);
+  $xml.append($p);
+
+  // use namespace 'foo' for our properties element
+  let props = new TestProps($p, `testPr`, `foo`);
+
+  props.onOff = true;
+  assert.ok(props.onOff, `didn't explode`);
+
+  assert.end();
+});
