@@ -15,6 +15,7 @@
   "author": "Chad Kirby",
   "devDependencies": {
     "@ckirby/dom-dom-dom-dommmm": "^2.3.1",
+    "cheerio": "^0.22.0",
     "eslint": "^6.7.1",
     "eslint-plugin-turbopatent": "^4.0.0",
     "jsdom": "^15.2.1",
@@ -25,7 +26,6 @@
   },
   "dependencies": {
     "block-re": "git+https://github.com/chadkirby/block-re.git",
-    "cheerio": "^0.22.0",
     "detect-node": "^2.0.3"
   },
   "files": [

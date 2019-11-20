@@ -1,7 +1,3 @@
-const cheerio = require('cheerio');
-
-const $ = cheerio.load(`<?xml version="1.0" ?>`, { xmlMode: true });
-
 //
 // mixin to persist data in an xml properties element, similar to how properties
 // are stored in pPr/rPr elements in ooxml.
@@ -19,8 +15,8 @@ const $ = cheerio.load(`<?xml version="1.0" ?>`, { xmlMode: true });
 // properties.pushToArray('foo', {bar: 6})
 // ==> <foo bar="5"/><foo bar="6"/>
 //
-
-let XmlPropertiesMixin = (superclass) => class extends superclass {
+const TEXT_NODE = 3;
+module.exports = (superclass) => class extends superclass {
   //
   // make a new instance, given a root element and a propertiesTag
   //
@@ -34,7 +30,7 @@ let XmlPropertiesMixin = (superclass) => class extends superclass {
       throw new Error(`propertiesTag must end in "Pr"`);
     }
     this.propertiesTag = propertiesTag;
-    this.$root = $(root);
+    this.$root = this.$(root);
     if (!this.$root.length) {
       // a missing $root is an unrecoverable error
       throw new Error(`need root for XmlProperties`);
@@ -43,6 +39,24 @@ let XmlPropertiesMixin = (superclass) => class extends superclass {
     // time traversing when the dom is very large
     this.propertiesCache = new Map();
   }
+
+  //
+  // wrap a node in our cheerio-like wrapper
+  //
+  $(node) { /* required */ }
+  //
+  // return the (outer) html of the $Pr element
+  //
+  html() { /* required */ }
+  //
+  // return the nodeName of the node
+  //
+  getNodeName(node) { /* required */ }
+
+  isTextNode(node) {
+    return node.nodeType === TEXT_NODE;
+  }
+
   //
   // get the $Pr element where our properties are stored
   //
@@ -52,15 +66,15 @@ let XmlPropertiesMixin = (superclass) => class extends superclass {
     // speed up the process. We're assuming 1) that our $root may have other
     // properties elements; 2) that property-elements are always prepended to
     // $root; and 3) that a properties element's name ends in 'Pr'
-    let $Pr = findOneChild(
+    let $Pr = this.$(findOneChild(
       // search children of our $root
       this.$root,
       // for an element with our propertiesTag
       this.ensureNamespace(this.propertiesTag),
       // stop searching when we hit a non-text element that is not a properties
       // element
-      ({ name, type }) => type !== `text` && !isPropertiesTag(name)
-    );
+      (el) => !this.isTextNode(el) && !isPropertiesTag(this.getNodeName(el))
+    ));
     if ($Pr.length) {
       // once our $Pr has been created, it shouldn't change, so we'll replace
       // this getter with a simple property
@@ -69,18 +83,12 @@ let XmlPropertiesMixin = (superclass) => class extends superclass {
     return $Pr;
   }
   //
-  // return the (outer) html of the $Pr element
-  //
-  html() {
-    return $.html(this.$Pr);
-  }
-  //
   // return our $Pr element, prepending it as a child of our root element if necessary
   //
   ensurePr() {
     let $prop = this.$Pr;
     if (!$prop.length) {
-      $prop = $(`<${this.ensureNamespace(this.propertiesTag)}/>`);
+      $prop = this.$(`<${this.ensureNamespace(this.propertiesTag)}/>`);
       this.$root.prepend($prop);
     }
     return $prop;
@@ -93,7 +101,7 @@ let XmlPropertiesMixin = (superclass) => class extends superclass {
     if (!noCache && propertiesCache.has(tag)) {
       return propertiesCache.get(tag);
     }
-    let $prop = findChildren(this.$Pr, this.ensureNamespace(tag));
+    let $prop = this.$(findChildren(this.$Pr, this.ensureNamespace(tag)));
     if (!$prop.length) {
       return;
     }
@@ -112,7 +120,7 @@ let XmlPropertiesMixin = (superclass) => class extends superclass {
   ensureProperty(tag) {
     let $prop = this.findProperty(tag);
     if (!$prop) {
-      $prop = $(`<${this.ensureNamespace(tag)}/>`);
+      $prop = this.$(`<${this.ensureNamespace(tag)}/>`);
       this.ensurePr().append($prop);
       this.propertiesCache.set(tag, $prop);
     }
@@ -133,7 +141,7 @@ let XmlPropertiesMixin = (superclass) => class extends superclass {
   //
   setAttrs(el, attrs = {}) {
     Object.keys(attrs).forEach((key) => {
-      $(el).attr(key, attrs[key]);
+      this.$(el).attr(key, attrs[key]);
     });
   }
   //
@@ -145,7 +153,7 @@ let XmlPropertiesMixin = (superclass) => class extends superclass {
     if (!$vals) {
       return [];
     }
-    return $vals.toArray().map(({ attribs }) => attribs);
+    return $vals.toArray().map((el) => this.$(el).attr());
   }
   //
   // set an array of pojo values for a given tag
@@ -160,7 +168,7 @@ let XmlPropertiesMixin = (superclass) => class extends superclass {
   // add one array-item having the given attributes for the given tag
   //
   pushToArray(tag, attrs = {}, $Pr = this.ensurePr()) {
-    let $tag = $(`<${this.ensureNamespace(tag)}/>`);
+    let $tag = this.$(`<${this.ensureNamespace(tag)}/>`);
     $Pr.append($tag);
     this.setAttrs($tag, attrs);
     return $tag;
@@ -239,10 +247,6 @@ let XmlPropertiesMixin = (superclass) => class extends superclass {
   }
 };
 
-function isPropertiesTag(tag) {
-  return tag.endsWith(`Pr`);
-}
-
 function findOneChild($el, targetName, shouldEarlyOut = no) {
   return findChildren($el, targetName, (child, results) => results.length || shouldEarlyOut(child, results));
 }
@@ -252,8 +256,8 @@ function findChildren($el, targetName, shouldEarlyOut = no) {
   if ($el.length) {
     let { children } = $el[0];
     for (let child of children) {
-      let { name } = child;
-      if (name === targetName) {
+      let { name, matches } = child;
+      if ((name && name === targetName) || (matches && child.matches(targetName))) {
         results.push(child);
       }
       // stop searching?
@@ -262,11 +266,15 @@ function findChildren($el, targetName, shouldEarlyOut = no) {
       }
     }
   }
-  return $(results);
+  return results;
+}
+
+
+function isPropertiesTag(tag) {
+  return tag.endsWith(`Pr`);
 }
 
 function no() {
   return false;
 }
 
-module.exports = XmlPropertiesMixin;
