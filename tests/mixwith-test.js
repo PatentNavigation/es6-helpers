@@ -1,6 +1,6 @@
 let mix = require('../src/mixwith');
 
-let test = require('./get-test')();
+let test = require('./tape')(module);
 
 test('mixwith mixes with', function(assert) {
   function mixinA(superclass) {

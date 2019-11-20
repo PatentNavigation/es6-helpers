@@ -5,7 +5,7 @@ const mix = require('../src/mixwith');
 const XmlPropertiesMixin = require('../src/xml-properties-mixin');
 const XmlNamespaceMixin = require('../src/xml-namespace-mixin');
 
-const test = require('./get-test')();
+const test = require('./tape')(module);
 
 // define a TestProps class with an on/off property, a simple string property, and an array property
 class TestProps extends mix().with(XmlPropertiesMixin, XmlNamespaceMixin) {

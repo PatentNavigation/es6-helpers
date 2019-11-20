@@ -2,7 +2,7 @@ let mix = require('../src/mixwith');
 
 let GetMixin = require('../src/get-mixin');
 
-let test = require('./get-test')();
+let test = require('./tape')(module);
 
 test('GetMixin adds a get function that gets kind of like ember', function(assert) {
   class TestGet extends mix().with(GetMixin) {

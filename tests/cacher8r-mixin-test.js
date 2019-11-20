@@ -2,7 +2,7 @@ let mix = require('../src/mixwith');
 
 let CacheR8R = require('../src/cacher8r-mixin');
 
-let test = require('./get-test')();
+let test = require('./tape')(module);
 
 test('CacheR8R caches properties', function(assert) {
   let aaComputed = 0;

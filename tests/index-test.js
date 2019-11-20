@@ -1,4 +1,4 @@
-let test = require('./get-test')();
+let test = require('./tape')(module);
 let { CacheR8R, mix, GetMixin } = require('../src/index');
 
 test('index exports something', function(assert) {

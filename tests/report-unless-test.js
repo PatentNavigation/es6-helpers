@@ -1,4 +1,4 @@
-let test = require('./get-test')();
+let test = require('./tape')(module);
 let reportUnless = require('../src/report-unless');
 let config = require('../src/config');
 

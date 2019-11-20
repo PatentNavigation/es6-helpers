@@ -1,4 +1,4 @@
-let test = require('./get-test')();
+let test = require('./tape')(module);
 let makeNSTagSelector = require('../src/make-ns-tag-selector');
 
 test('makeNSTagSelector escapes and name-spaces a selector', function(assert) {

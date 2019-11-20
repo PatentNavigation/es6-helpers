@@ -1,4 +1,4 @@
-let test = require('./get-test')();
+let test = require('./tape')(module);
 
 test('config configs', function(assert) {
   let config0 = require('../src/config');
