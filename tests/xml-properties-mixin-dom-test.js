@@ -17,8 +17,8 @@ class TestProps extends mix().with(XmlPropertiesMixin, XmlNamespaceMixin) {
   $(item) {
     return _$(item);
   }
-  html($item) {
-    return $item.outerHtml();
+  html() {
+    return this.$Pr.outerHtml();
   }
   getNodeName(el) {
     return el.nodeName;

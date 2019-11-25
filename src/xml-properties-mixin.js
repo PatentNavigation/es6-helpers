@@ -66,16 +66,8 @@ module.exports = (superclass) => class extends superclass {
     // speed up the process. We're assuming 1) that our $root may have other
     // properties elements; 2) that property-elements are always prepended to
     // $root; and 3) that a properties element's name ends in 'Pr'
-    let $Pr = this.$(findOneChild(
-      // search children of our $root
-      this.$root,
-      // for an element with our propertiesTag
-      this.ensureNamespace(this.propertiesTag),
-      // stop searching when we hit a non-text element that is not a properties
-      // element
-      (el) => !this.isTextNode(el) && !isPropertiesTag(this.getNodeName(el))
-    ));
-    if ($Pr.length) {
+    let $Pr = this.findPrElement();
+    if ($Pr && $Pr.length) {
       // once our $Pr has been created, it shouldn't change, so we'll replace
       // this getter with a simple property
       Object.defineProperty(this, `$Pr`, { value: $Pr });
@@ -87,7 +79,7 @@ module.exports = (superclass) => class extends superclass {
   //
   ensurePr() {
     let $prop = this.$Pr;
-    if (!$prop.length) {
+    if (!($prop && $prop.length)) {
       $prop = this.$(`<${this.ensureNamespace(this.propertiesTag)}/>`);
       this.$root.prepend($prop);
     }
@@ -101,8 +93,8 @@ module.exports = (superclass) => class extends superclass {
     if (!noCache && propertiesCache.has(tag)) {
       return propertiesCache.get(tag);
     }
-    let $prop = this.$(findChildren(this.$Pr, this.ensureNamespace(tag)));
-    if (!$prop.length) {
+    let $prop = this.findChildren(this.ensureNamespace(tag));
+    if (!($prop && $prop.length)) {
       return;
     }
     if (!noCache) {
@@ -133,7 +125,7 @@ module.exports = (superclass) => class extends superclass {
     let $prop = this.findProperty(tag);
     if ($prop) {
       $prop.remove();
-      this.propertiesCache.delete(tag, $prop);
+      this.propertiesCache.delete(tag);
     }
   }
   //
@@ -245,36 +237,37 @@ module.exports = (superclass) => class extends superclass {
   copyAs(NewPropsClass) {
     return new NewPropsClass(this.$root);
   }
-};
 
-function findOneChild($el, targetName, shouldEarlyOut = no) {
-  return findChildren($el, targetName, (child, results) => results.length || shouldEarlyOut(child, results));
-}
+  findPrElement() {
+    // search for an element with our propertiesTag
+    let target = this.ensureNamespace(this.propertiesTag);
 
-function findChildren($el, targetName, shouldEarlyOut = no) {
-  let results = [];
-  if ($el.length) {
-    let { children } = $el[0];
-    for (let child of children) {
-      let { name, matches } = child;
-      if ((name && name === targetName) || (matches && child.matches(targetName))) {
-        results.push(child);
+    for (const child of this.$root.children().toArray()) {
+      if (this.getNodeName(child) === target) {
+        return this.$(child);
       }
-      // stop searching?
-      if (shouldEarlyOut(child, results)) {
-        break;
+      // stop searching when we hit a non-text element that is not a properties
+      // element
+      if (this.isTextNode(child) || !isPropertiesTag(this.getNodeName(child))) {
+        return;
       }
     }
   }
-  return results;
-}
+
+  findChildren(targetName) {
+    let $Pr = this.$Pr;
+    if ($Pr && $Pr.length) {
+      return this.$(
+        $Pr.children().toArray().filter(
+          (el) => this.getNodeName(el) === targetName
+        )
+      );
+    }
+  }
+
+};
 
 
 function isPropertiesTag(tag) {
   return tag.endsWith(`Pr`);
 }
-
-function no() {
-  return false;
-}
-
