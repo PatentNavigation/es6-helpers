@@ -18,11 +18,12 @@
     esutils "^2.0.2"
     js-tokens "^4.0.0"
 
-"@ckirby/dom-dom-dom-dommmm@^2.3.1":
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/@ckirby/dom-dom-dom-dommmm/-/dom-dom-dom-dommmm-2.3.1.tgz#77f0d7da80eca70edf0096956344188c4185667b"
-  integrity sha512-oAF7Ym2XrPrGt2YboKWirVyfifT3YGAGyFxiYKoImoKhN8N3X+JzctLElEmPAkqUVCgIhNeXOlgE5zu8BTjLog==
+"@ckirby/dom-dom-dom-dommmm@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@ckirby/dom-dom-dom-dommmm/-/dom-dom-dom-dommmm-3.0.0.tgz#18b69e63a27786e24320db1d0dd404ab4f3a9ab5"
+  integrity sha512-tHEcaE8qYzRjqF63rVni5K1KYy/fAUu6F04DxRRddpcX8Lq6jSlSaXK/6SBGJmNE5zpzbsn/CMO6gmX6TCdQGQ==
   dependencies:
+    css-select "^2.1.0"
     globalthis "^1.0.0"
 
 "@ember-data/rfc395-data@^0.0.4":
@@ -207,7 +208,7 @@ bluebird@^3.5.0:
   version "3.5.1"
   resolved "https://registry.yarnpkg.com/bluebird/-/bluebird-3.5.1.tgz#d9551f9de98f1fcda1e683d17ee91a0602ee2eb9"
 
-boolbase@~1.0.0:
+boolbase@^1.0.0, boolbase@~1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/boolbase/-/boolbase-1.0.0.tgz#68dff5fbe60c51eb37725ea9e3ed310dcc1e776e"
 
@@ -395,6 +396,16 @@ cryptiles@3.x.x:
   dependencies:
     boom "5.x.x"
 
+css-select@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/css-select/-/css-select-2.1.0.tgz#6a34653356635934a81baca68d0255432105dbef"
+  integrity sha512-Dqk7LQKpwLoH3VovzZnkzegqNSuAziQyNZUcrdDM401iY+R5NkGBXGmtO05/yaXQziALuPogeG0b7UAgjnTJTQ==
+  dependencies:
+    boolbase "^1.0.0"
+    css-what "^3.2.1"
+    domutils "^1.7.0"
+    nth-check "^1.0.2"
+
 css-select@~1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/css-select/-/css-select-1.2.0.tgz#2b3a110539c5355f1cd8d314623e870b121ec858"
@@ -407,6 +418,11 @@ css-select@~1.2.0:
 css-what@2.1:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/css-what/-/css-what-2.1.0.tgz#9467d032c38cfaefb9f2d79501253062f87fa1bd"
+
+css-what@^3.2.1:
+  version "3.2.1"
+  resolved "https://registry.yarnpkg.com/css-what/-/css-what-3.2.1.tgz#f4a8f12421064621b456755e34a03a2c22df5da1"
+  integrity sha512-WwOrosiQTvyms+Ti5ZC5vGEK0Vod3FTt1ca+payZqvKuGJF+dq7bG63DstxtN0dpm6FxY27a/zS3Wten+gEtGw==
 
 cssom@^0.4.1:
   version "0.4.4"
@@ -543,6 +559,14 @@ domhandler@^2.3.0:
 domutils@1.5.1, domutils@^1.5.1:
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/domutils/-/domutils-1.5.1.tgz#dcd8488a26f563d61079e48c9f7b7e32373682cf"
+  dependencies:
+    dom-serializer "0"
+    domelementtype "1"
+
+domutils@^1.7.0:
+  version "1.7.0"
+  resolved "https://registry.yarnpkg.com/domutils/-/domutils-1.7.0.tgz#56ea341e834e06e6748af7a1cb25da67ea9f8c2a"
+  integrity sha512-Lgd2XcJ/NjEw+7tFvfKxOzCYKZsdct5lczQ2ZaQY8Djz7pfAD3Gbp8ySJWtreII/vDlMVmxwa6pHmdxIYgttDg==
   dependencies:
     dom-serializer "0"
     domelementtype "1"
@@ -1523,6 +1547,13 @@ normalize-package-data@^2.3.2, normalize-package-data@^2.3.4:
     resolve "^1.10.0"
     semver "2 || 3 || 4 || 5"
     validate-npm-package-license "^3.0.1"
+
+nth-check@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/nth-check/-/nth-check-1.0.2.tgz#b2bd295c37e3dd58a3bf0700376663ba4d9cf05c"
+  integrity sha512-WeBOdju8SnzPN5vTUJYxYUxLeXpCaVP5i5e0LF8fg7WORF2Wd7wFX/pk0tYZk7s8T+J7VLy0Da6J1+wCT0AtHg==
+  dependencies:
+    boolbase "~1.0.0"
 
 nth-check@~1.0.1:
   version "1.0.1"

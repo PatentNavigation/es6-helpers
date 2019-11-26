@@ -14,7 +14,7 @@
   "repository": "https://github.com/PatentNavigation/es6-helpers",
   "author": "Chad Kirby",
   "devDependencies": {
-    "@ckirby/dom-dom-dom-dommmm": "^2.3.1",
+    "@ckirby/dom-dom-dom-dommmm": "^3.0.0",
     "cheerio": "^0.22.0",
     "eslint": "^6.7.1",
     "eslint-plugin-turbopatent": "^4.0.0",

@@ -1,9 +1,9 @@
-require('@ckirby/dom-dom-dom-dommmm/node/setup')(require('jsdom'));
-const dom = require('@ckirby/dom-dom-dom-dommmm/node');
+require('@ckirby/dom-dom-dom-dommmm/setup').setJSDOM(require('jsdom'));
+const { loadXml } = require('@ckirby/dom-dom-dom-dommmm');
 
 const mix = require('../src/mixwith');
 
-let _$ = dom.loadXml(`<test-data xmlns:w="namespace-yo"/>`);
+let _$ = loadXml(`<test-data xmlns:w="namespace-yo"/>`);
 const XmlPropertiesMixin = require('../src/xml-properties-mixin');
 const XmlNamespaceMixin = require('../src/xml-namespace-mixin');
 
@@ -67,7 +67,7 @@ class TestProps extends mix().with(XmlPropertiesMixin, XmlNamespaceMixin) {
 }
 
 test('XmlPropertiesMixin persists data in a Pr element', function(assert) {
-  const $ = dom.loadXml(`<test-data />`);
+  const $ = loadXml(`<test-data />`);
 
   let $xml = $.query(`test-data`);
   // make an element that we'll attach properties to
@@ -140,7 +140,7 @@ test('XmlPropertiesMixin persists data in a Pr element', function(assert) {
 });
 
 test.skip('XmlPropertiesMixin persists data in a Pr element with a namespace', function(assert) {
-  const $ = dom.loadXml(`<test-data xmlns:w="w-yo"  xmlns:foo="foo-yo"/>`);
+  const $ = loadXml(`<test-data xmlns:w="w-yo"  xmlns:foo="foo-yo"/>`);
 
   let $xml = $.query(`test-data`);
   // make an element that we'll attach properties to
@@ -186,7 +186,7 @@ test.skip('XmlPropertiesMixin persists data in a Pr element with a namespace', f
 });
 
 test.skip(`XmlPropertiesMixin instances can copy themselves as a new type`, (assert) => {
-  const $ = dom.loadXml(`<test-data xmlns:w="namespace-yo"/>`);
+  const $ = loadXml(`<test-data xmlns:w="namespace-yo"/>`);
 
   let $xml = $.query(`test-data`);
   // make an element that we'll attach properties to
@@ -204,7 +204,7 @@ test.skip(`XmlPropertiesMixin instances can copy themselves as a new type`, (ass
 });
 
 test.skip('XmlPropertiesMixin tolerates whitespace in the XML', function(assert) {
-  const $ = dom.loadXml(`<test-data xmlns:w="namespace-yo"/>`);
+  const $ = loadXml(`<test-data xmlns:w="namespace-yo"/>`);
 
   let $xml = $.query(`test-data`);
   // make a pretty-formatted element that we'll attach properties to
