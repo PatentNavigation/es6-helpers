@@ -1,12 +1,15 @@
 # Cache key definitions
 cache-node-modules: &cache-node-modules
-  key: node-modules-cache-v1-{{ checksum "package.json" }}
+  key: node-modules-cache-{{ checksum "yarn.lock" }}
 
 version: 2
 jobs:
   test:
     docker:
-      - image: circleci/node:7.10
+      - image: turbopatent/docker-lambda:nodejs10.x
+
+    environment:
+       BASH_ENV: ~/.bashrc
 
     steps:
       - checkout
@@ -15,8 +18,8 @@ jobs:
       - run:
           name: ensure node_modules
           command: |
-            [ -d node_modules ] || yarn
-      - run: yarn test
+            yarn --frozen-lockfile
+      - run: yarn test:ci
       - save_cache:
           <<: *cache-node-modules
           paths:
@@ -24,6 +27,6 @@ jobs:
 
 workflows:
   version: 2
-  ci:
+  test-a-ronie:
     jobs:
       - test
