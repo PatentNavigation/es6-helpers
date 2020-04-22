@@ -20,7 +20,7 @@
     "tom-jumbo-grumbo": "git+ssh://git@github.com/PatentNavigation/tom-jumbo-grumbo.git#v1.0.2"
   },
   "dependencies": {
-    "block-re": "git+https://github.com/chadkirby/block-re.git",
+    "@ckirby/block-re": "1.1.2",
     "cheerio": "^0.22.0",
     "detect-node": "^2.0.3"
   },

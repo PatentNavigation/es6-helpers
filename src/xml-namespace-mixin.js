@@ -1,4 +1,4 @@
-const re = require('block-re');
+const re = require('@ckirby/block-re');
 
 const makeNSTagSelector = require('./make-ns-tag-selector');
 
