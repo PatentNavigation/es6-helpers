@@ -2,6 +2,11 @@
 # yarn lockfile v1
 
 
+"@ckirby/block-re@1.1.2":
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/@ckirby/block-re/-/block-re-1.1.2.tgz#df2705250264f362118d91ae912d4ebf8810f7db"
+  integrity sha512-nJlBVIDW+1SVe8ycSfuU7Nme66HvFMJDgQdN80OkdFEkgnoJstIMCZx9EBxUiCAHomXTv3RrkFUA/dRXfhGTeg==
+
 acorn-jsx@^3.0.0:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/acorn-jsx/-/acorn-jsx-3.0.1.tgz#afdf9488fb1ecefc8348f6fb22f464e32a58b36b"
@@ -121,10 +126,6 @@ bcrypt-pbkdf@^1.0.0:
   resolved "https://registry.yarnpkg.com/bcrypt-pbkdf/-/bcrypt-pbkdf-1.0.1.tgz#63bc5dcb61331b92bc05fd528953c33462a06f8d"
   dependencies:
     tweetnacl "^0.14.3"
-
-"block-re@git+https://github.com/chadkirby/block-re.git":
-  version "1.0.0"
-  resolved "git+https://github.com/chadkirby/block-re.git#98cb22591f1e04fd3b357e217702356cf88647e1"
 
 bluebird@^3.5.0:
   version "3.5.1"

@@ -1,4 +1,4 @@
-let re = require('block-re');
+let re = require('@ckirby/block-re');
 
 function makeNSTagSelector(namespace = '') {
   //
