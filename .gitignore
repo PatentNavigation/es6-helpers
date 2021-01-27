@@ -1,6 +1,0 @@
-node_modules
-.cache
-local-settings.js
-.DS_Store
-/.idea/
-/lib
